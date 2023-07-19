@@ -1,7 +1,12 @@
-FROM alpine 
+FROM golang:latest AS builder
 
-MAINTAINER Joceir Luiz <joceirluiz@gmail.com
+WORKDIR /go
 
-COPY helloworld ./helloworld
+COPY helloworld.go /go
 
-ENTRYPOINT ./helloworld
+RUN CGO_ENABLED=0 GOOS=linux go build -o helloworld helloworld.go
+
+FROM scratch
+WORKDIR /go
+COPY --from=builder /go/helloworld ./
+CMD [ "./helloworld" ]
